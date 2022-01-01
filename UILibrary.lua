@@ -1,1294 +1,1376 @@
--- This User Interface Library is brought to you by Solaris Software.
-local Solaris = Instance.new("ScreenGui")
-Solaris.Name = tostring(math.random())
-Solaris.Parent = game.CoreGui
-Solaris.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-local NotificationHolder = Instance.new("ScreenGui")
-NotificationHolder.Name = tostring(math.random())
-NotificationHolder.Parent = game.CoreGui
-NotificationHolder.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local LocalPlayer = game:GetService("Players").LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
-local http = game:GetService("HttpService")
-
-local WhitelistedMouse = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2,Enum.UserInputType.MouseButton3}
-local BlacklistedKeys = {Enum.KeyCode.Unknown,Enum.KeyCode.W,Enum.KeyCode.A,Enum.KeyCode.S,Enum.KeyCode.D,Enum.KeyCode.Up,Enum.KeyCode.Left,Enum.KeyCode.Down,Enum.KeyCode.Right,Enum.KeyCode.Slash,Enum.KeyCode.Tab,Enum.KeyCode.Backspace,Enum.KeyCode.Escape}
-
-local function CheckKey(tab, key)
-	for i, v in next, tab do
-		if v == key then
-			return true
-		end
-	end
-end
+--[[
+	 ______ _____ _   _ _____ _________     __
+	|  ____|_   _| \ | |_   _|__   __\ \   / /
+	| |__    | | |  \| | | |    | |   \ \_/ / 
+	|  __|   | | | . ` | | |    | |    \   /  
+	| |     _| |_| |\  |_| |_   | |     | |   
+	|_|    |_____|_| \_|_____|  |_|     |_|   
+	
+	Source:
+		https://d3to-finity.000webhostapp.com/files/source-0.1.2.txt
+	Version:
+	 0.1.4
+	Date: 
+		January 18th, 2020
+	Author: 
+		detourious @ v3rmillion.net
+		deto#7612  @ discord.gg
+					
+--]]
 
 
+local finity = {}
+finity.gs = {}
 
-local NotificationFrame = game:GetObjects("rbxassetid://6924028278")[1]
-NotificationFrame.ZIndex = 4
-NotificationFrame.Parent = NotificationHolder
-script = NotificationFrame.NotifScript
-local Notify = loadstring(NotificationFrame.NotifScript.Source)()
-script = oldScript
+finity.theme = { -- light
+	main_container = Color3.fromRGB(249, 249, 255),
+	separator_color = Color3.fromRGB(223, 219, 228),
 
-local SolarisLib = {
-    Themes = {
-        Default = {
-            MainFrame = Color3.fromRGB(25, 25, 25),
-            TopBar = Color3.fromRGB(30, 30, 30),
-            TextColor =  Color3.fromRGB(255,255,255),
-            Menu = Color3.fromRGB(37, 37, 37),
-            TabToggled = Color3.fromRGB(43,43,43),
-            Button = Color3.fromRGB(30,30,30),
-            ButtonHold = Color3.fromRGB(31,31,31),
-            Toggle = Color3.fromRGB(30,30,30),
-            ToggleFrame = Color3.fromRGB(55,55,55),
-            ToggleToggled = Color3.fromRGB(22, 168, 76),
-            Slider = Color3.fromRGB(30,30,30),
-            SliderBar = Color3.fromRGB(25, 25, 25),
-            SliderInc = Color3.fromRGB(60, 60, 60),
-            Dropdown = Color3.fromRGB(30,30,30),
-            DropdownItem = Color3.fromRGB(30,30,30),
-            Textbox = Color3.fromRGB(30,30,30),
-            TextboxFrame = Color3.fromRGB(25, 25, 25),
-            Colorpicker = Color3.fromRGB(30,30,30),
-            Label = Color3.fromRGB(30,30,30),
-            Bind = Color3.fromRGB(30,30,30)
-        },
-        Discord = {
-            MainFrame = Color3.fromRGB(54,57,63),
-            TopBar = Color3.fromRGB(47,49,54),
-            TextColor =  Color3.fromRGB(255,255,255),
-            Menu = Color3.fromRGB(47,49,54),
-            TabToggled = Color3.fromRGB(54,57,63),
-            Button = Color3.fromRGB(88,101,242),
-            ButtonHold = Color3.fromRGB(71,82,196),
-            Toggle = Color3.fromRGB(47,49,54),
-            ToggleFrame = Color3.fromRGB(67,69,74),
-            ToggleToggled = Color3.fromRGB(22, 168, 76),
-            Slider = Color3.fromRGB(47,49,54),
-            SliderBar = Color3.fromRGB(42,44,49),
-            SliderInc = Color3.fromRGB(62,64,69),
-            Dropdown = Color3.fromRGB(47,49,54),
-            DropdownItem = Color3.fromRGB(47,49,54),
-            Textbox = Color3.fromRGB(47,49,54),
-            TextboxFrame = Color3.fromRGB(42,44,49),
-            Colorpicker = Color3.fromRGB(47,49,54),
-            Label = Color3.fromRGB(47,49,54),
-            Bind = Color3.fromRGB(47,49,54)
-        },
-        Blue = {
-            MainFrame = Color3.fromRGB(35, 35, 50),
-            TopBar = Color3.fromRGB(40, 40, 55),
-            TextColor =  Color3.fromRGB(255,255,255),
-            Menu = Color3.fromRGB(47, 47, 62),
-            TabToggled = Color3.fromRGB(53,53,68),
-            Button = Color3.fromRGB(40,40,55),
-            ButtonHold = Color3.fromRGB(41,41,56),
-            Toggle = Color3.fromRGB(40,40,55),
-            ToggleFrame = Color3.fromRGB(65,65,80),
-            ToggleToggled = Color3.fromRGB(64, 64, 120),
-            Slider = Color3.fromRGB(40,40,55),
-            SliderBar = Color3.fromRGB(35, 35, 50),
-            SliderInc = Color3.fromRGB(70, 70, 85),
-            Dropdown = Color3.fromRGB(40,40,55),
-            DropdownItem = Color3.fromRGB(40,40,55),
-            Textbox = Color3.fromRGB(40,40,55),
-            TextboxFrame = Color3.fromRGB(35, 35, 50),
-            Colorpicker = Color3.fromRGB(40,40,55),
-            Label = Color3.fromRGB(40,40,55),
-            Bind = Color3.fromRGB(40,40,55)
-        },
-        Red = {
-            MainFrame = Color3.fromRGB(50, 35, 35),
-            TopBar = Color3.fromRGB(55, 40, 40),
-            TextColor =  Color3.fromRGB(255,255,255),
-            Menu = Color3.fromRGB(62, 47, 47),
-            TabToggled = Color3.fromRGB(68,53,53),
-            Button = Color3.fromRGB(55,40,40),
-            ButtonHold = Color3.fromRGB(56,41,41),
-            Toggle = Color3.fromRGB(55,40,40),
-            ToggleFrame = Color3.fromRGB(80,65,65),
-            ToggleToggled = Color3.fromRGB(120, 64, 64),
-            Slider = Color3.fromRGB(55,40,40),
-            SliderBar = Color3.fromRGB(50, 35, 35),
-            SliderInc = Color3.fromRGB(85, 70, 70),
-            Dropdown = Color3.fromRGB(55,40,40),
-            DropdownItem = Color3.fromRGB(55,40,40),
-            Textbox = Color3.fromRGB(55,40,40),
-            TextboxFrame = Color3.fromRGB(50, 35, 35),
-            Colorpicker = Color3.fromRGB(55,40,40),
-            Label = Color3.fromRGB(55,40,40),
-            Bind = Color3.fromRGB(55,40,40)
-        },
-        Green = {
-            MainFrame = Color3.fromRGB(35, 50, 35),
-            TopBar = Color3.fromRGB(40, 55, 40),
-            TextColor =  Color3.fromRGB(255,255,255),
-            Menu = Color3.fromRGB(47, 62, 47),
-            TabToggled = Color3.fromRGB(53,68,53),
-            Button = Color3.fromRGB(40,55,40),
-            ButtonHold = Color3.fromRGB(41,56,41),
-            Toggle = Color3.fromRGB(40,55,40),
-            ToggleFrame = Color3.fromRGB(65,80,65),
-            ToggleToggled = Color3.fromRGB(64, 120, 64),
-            Slider = Color3.fromRGB(40,55,40),
-            SliderBar = Color3.fromRGB(35, 50, 35),
-            SliderInc = Color3.fromRGB(70, 85, 70),
-            Dropdown = Color3.fromRGB(40,55,40),
-            DropdownItem = Color3.fromRGB(40,55,40),
-            Textbox = Color3.fromRGB(40,55,40),
-            TextboxFrame = Color3.fromRGB(35, 50, 35),
-            Colorpicker = Color3.fromRGB(40,55,40),
-            Label = Color3.fromRGB(40,55,40),
-            Bind = Color3.fromRGB(40,55,40)
-        }
-    },
-    Settings = {
-        Theme = "Default",
-        ShowFriendsOnLaunch = true,
-        ShowMusicOnLaunch = true,
-        CloseBind = "RightControl"
-    },
-    Flags = {},
-    CurrentTab
+	text_color = Color3.fromRGB(96, 96, 96),
+
+	category_button_background = Color3.fromRGB(223, 219, 228),
+	category_button_border = Color3.fromRGB(200, 196, 204),
+
+	checkbox_checked = Color3.fromRGB(114, 214, 112),
+	checkbox_outer = Color3.fromRGB(198, 189, 202),
+	checkbox_inner = Color3.fromRGB(249, 239, 255),
+
+	slider_color = Color3.fromRGB(114, 214, 112),
+	slider_color_sliding = Color3.fromRGB(114, 214, 112),
+	slider_background = Color3.fromRGB(198, 188, 202),
+	slider_text = Color3.fromRGB(112, 112, 112),
+
+	textbox_background = Color3.fromRGB(198, 189, 202),
+	textbox_background_hover = Color3.fromRGB(215, 206, 227),
+	textbox_text = Color3.fromRGB(112, 112, 112),
+	textbox_text_hover = Color3.fromRGB(50, 50, 50),
+	textbox_placeholder = Color3.fromRGB(178, 178, 178),
+
+	dropdown_background = Color3.fromRGB(198, 189, 202),
+	dropdown_text = Color3.fromRGB(112, 112, 112),
+	dropdown_text_hover = Color3.fromRGB(50, 50, 50),
+	dropdown_scrollbar_color = Color3.fromRGB(198, 189, 202),
+	
+	button_background = Color3.fromRGB(198, 189, 202),
+	button_background_hover = Color3.fromRGB(215, 206, 227),
+	button_background_down = Color3.fromRGB(178, 169, 182),
+	
+	scrollbar_color = Color3.fromRGB(198, 189, 202),
 }
 
+finity.dark_theme = { -- dark
+	main_container = Color3.fromRGB(32, 32, 33),
+	separator_color = Color3.fromRGB(63, 63, 65),
+
+	text_color = Color3.fromRGB(206, 206, 206),
+
+	category_button_background = Color3.fromRGB(63, 62, 65),
+	category_button_border = Color3.fromRGB(72, 71, 74),
+
+	checkbox_checked = Color3.fromRGB(132, 255, 130),
+	checkbox_outer = Color3.fromRGB(84, 81, 86),
+	checkbox_inner = Color3.fromRGB(132, 132, 136),
+
+	slider_color = Color3.fromRGB(177, 177, 177),
+	slider_color_sliding = Color3.fromRGB(132, 255, 130),
+	slider_background = Color3.fromRGB(88, 84, 90),
+	slider_text = Color3.fromRGB(177, 177, 177),
+
+	textbox_background = Color3.fromRGB(103, 103, 106),
+	textbox_background_hover = Color3.fromRGB(137, 137, 141),
+	textbox_text = Color3.fromRGB(195, 195, 195),
+	textbox_text_hover = Color3.fromRGB(232, 232, 232),
+	textbox_placeholder = Color3.fromRGB(135, 135, 138),
+
+	dropdown_background = Color3.fromRGB(88, 88, 91),
+	dropdown_text = Color3.fromRGB(195, 195, 195),
+	dropdown_text_hover = Color3.fromRGB(232, 232, 232),
+	dropdown_scrollbar_color = Color3.fromRGB(118, 118, 121),
+	
+	button_background = Color3.fromRGB(103, 103, 106),
+	button_background_hover = Color3.fromRGB(137, 137, 141),
+	button_background_down = Color3.fromRGB(70, 70, 81),
+	
+	scrollbar_color = Color3.fromRGB(118, 118, 121),
+}
+
+setmetatable(finity.gs, {
+	__index = function(_, service)
+		return game:GetService(service)
+	end,
+	__newindex = function(t, i)
+		t[i] = nil
+		return
+	end
+})
 
 
-local MainUI = game:GetObjects("rbxassetid://7835727566")[1]
-print("SolarisLib Loaded!")
-local function MakeDraggable(topbarobject, object) 
-    pcall(function()
-		local dragging, dragInput, mousePos, framePos = false
-		topbarobject.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
-				dragging = true
-				mousePos = input.Position
-				framePos = object.Position
+local mouse = finity.gs["Players"].LocalPlayer:GetMouse()
 
-				input.Changed:Connect(function()
-					if input.UserInputState == Enum.UserInputState.End then
-						dragging = false
-					end
-				end)
-			end
-		end)
-		topbarobject.InputChanged:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseMovement then
-				dragInput = input
-			end
-		end)
-		UserInputService.InputChanged:Connect(function(input)
-			if input == dragInput and dragging then
-				local delta = input.Position - mousePos
-				object.Position  = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
-			end
-		end)
-	end)
+function finity:Create(class, properties)
+	local object = Instance.new(class)
+
+	for prop, val in next, properties do
+		if object[prop] and prop ~= "Parent" then
+			object[prop] = val
+		end
+	end
+
+	return object
 end
 
+function finity:addShadow(object, transparency)
+	local shadow = self:Create("ImageLabel", {
+		Name = "Shadow",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0.5, 0, 0.5, 4),
+		Size = UDim2.new(1, 6, 1, 6),
+		Image = "rbxassetid://1316045217",
+		ImageTransparency = transparency and true or 0.5,
+		ImageColor3 = Color3.fromRGB(35, 35, 35),
+		ScaleType = Enum.ScaleType.Slice,
+		SliceCenter = Rect.new(10, 10, 118, 118)
+	})
 
-function Ripple(Object)
-	spawn(function()
-		local Circle = Instance.new("ImageLabel")
-		Circle.Parent = Object
-		Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		Circle.BackgroundTransparency = 1.000
-		Circle.ZIndex = 10
-		Circle.Image = "rbxassetid://266543268"
-		Circle.ImageColor3 = Color3.fromRGB(210,210,210)
-		Circle.ImageTransparency = 0.8
-		Circle.Position = UDim2.new(0, Mouse.X - Circle.AbsolutePosition.X, 0, Mouse.Y - Circle.AbsolutePosition.Y)
-		local Size = Object.AbsoluteSize.X
-		TweenService:Create(Circle, TweenInfo.new(0.5), {Position = UDim2.fromScale(math.clamp(Mouse.X - Object.AbsolutePosition.X, 0, Object.AbsoluteSize.X)/Object.AbsoluteSize.X,Object,math.clamp(Mouse.Y - Object.AbsolutePosition.Y, 0, Object.AbsoluteSize.Y)/Object.AbsoluteSize.Y) - UDim2.fromOffset(Size/2,Size/2), ImageTransparency = 1, Size = UDim2.fromOffset(Size,Size)}):Play()
-		spawn(function()
-			wait(0.5)
-			Circle:Destroy()
-		end)
-	end)
+	shadow.Parent = object
 end
 
-function SolarisLib:Notification(title, desc)
-    Notify:New(title,desc)
-end    
+function finity.new(isdark, gprojectName, thinProject)
+	local finityObject = {}
+	local self2 = finityObject
+	local self = finity
 
-function SolarisLib:New(Config)
-    if not isfolder(Config.FolderToSave) then 
-        makefolder(Config.FolderToSave)
-    end
+	if not finity.gs["RunService"]:IsStudio() and self.gs["CoreGui"]:FindFirstChild("FinityUI") then
+		warn("finity:", "instance already exists in coregui!")
+		
+		return
+	end
+
+	local theme = finity.theme
+	local projectName = false
+	local thinMenu = false
+	
+	if isdark == true then theme = finity.dark_theme end
+	if gprojectName then projectName = gprojectName end
+	if thinProject then thinMenu = thinProject end
+	
+	local toggled = true
+	local typing = false
+	local firstCategory = true
+    local savedposition = UDim2.new(0.5, 0, 0.5, 0)
     
-    if not isfolder(Config.FolderToSave .. "/configs") then 
-        makefolder(Config.FolderToSave .. "/configs")
-    end
-    
-    if not isfile(Config.FolderToSave .. "/settings.txt") then
-        local content = {}
-        for i,v in pairs(SolarisLib.Settings) do
-            content[i] = v
-        end
-        writefile(Config.FolderToSave .. "/settings.txt", tostring(http:JSONEncode(content)))
-    end    
-    SolarisLib.Settings = http:JSONDecode(readfile(Config.FolderToSave .. "/settings.txt"))
 
-    local closebindbinding = false
-    local fs = false
-    local tabcount = 0
-    local uitoggled = true
-    local tabmenutoggled = false
-    local TabPreset = game:GetObjects("rbxassetid://6958615840")[1]
-    local SectionPreset = game:GetObjects("rbxassetid://7121846230")[1]
-    local ContainerPreset = game:GetObjects("rbxassetid://7121886326")[1]
-    local MFrame = MainUI.MainFrame
-    MainUI.Parent = Solaris
-    MFrame.TopBar.TopFrameTitle.Text = Config.Name
-    MakeDraggable(MFrame.TopBar, MainUI) 
-    local oldScript = script
+	local finityData
+	finityData = {
+		UpConnection = nil,
+		ToggleKey = Enum.KeyCode.Home,
+	}
 
-    local MenuBtnPreset = game:GetObjects("rbxassetid://7037141226")[1]
-    local MusicBtn = MenuBtnPreset:Clone()
-    MusicBtn.Parent = MFrame.TopBar.ButtonHolder.MenuBtn.MenuFrame
-    MusicBtn.Position = UDim2.new(0,0,0,5)
-    MusicBtn.Text = "Music"
-    MusicBtn.MouseEnter:Connect(function() TweenService:Create(MusicBtn,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play() end)
-    MusicBtn.MouseLeave:Connect(function() TweenService:Create(MusicBtn,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play() end)
-    local SettingsBtn = MenuBtnPreset:Clone()
-    SettingsBtn.Parent = MFrame.TopBar.ButtonHolder.MenuBtn.MenuFrame
-    SettingsBtn.Position = UDim2.new(0,0,0,25)
-    SettingsBtn.Text = "Settings"
-    SettingsBtn.MouseEnter:Connect(function() TweenService:Create(SettingsBtn,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play() end)
-    SettingsBtn.MouseLeave:Connect(function() TweenService:Create(SettingsBtn,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play() end)
+	self2.ChangeToggleKey = function(NewKey)
+		finityData.ToggleKey = NewKey
+		
+		if not projectName then
+			self2.tip.Text = "Press '".. string.sub(tostring(NewKey), 14) .."' to hide this menu"
+		end
+		
+		if finityData.UpConnection then
+			finityData.UpConnection:Disconnect()
+		end
 
+		finityData.UpConnection = finity.gs["UserInputService"].InputEnded:Connect(function(Input)
+			if Input.KeyCode == finityData.ToggleKey and not typing then
+                toggled = not toggled
 
-    function MusicConstructor()
-        local abuttonhold = false
-        local playing = false
-        local MarketplaceService = game:GetService("MarketplaceService")
-        local MusicFrame, MusicPreset = game:GetObjects("rbxassetid://7296373622")[1], game:GetObjects("rbxassetid://7296615234")[1]
-        MusicFrame.Parent = Solaris
-        MusicFrame.ZIndex = 5
-        MusicFrame.Visible = SolarisLib.Settings.ShowMusicOnLaunch
-        MusicFrame.Frame.Title.Text = "Not Playing"
-        MusicFrame.Frame.Progress.ProgressFrame.Size = UDim2.new(0,0,1,0)
-        MusicFrame.Frame.AddBtn.AutoButtonColor = false
+                pcall(function() self2.modal.Modal = toggled end)
 
-        MakeDraggable(MusicFrame.Frame.TopBar,MusicFrame)
-        MusicFrame.Frame.TopBar.CloseBtn.MouseButton1Click:Connect(function()
-            MusicFrame.Visible = false
-        end)
-        MusicFrame.Frame.TopBar.CloseBtn.MouseEnter:Connect(function() TweenService:Create(MusicFrame.Frame.TopBar.CloseBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0}):Play() end)
-        MusicFrame.Frame.TopBar.CloseBtn.MouseLeave:Connect(function() TweenService:Create(MusicFrame.Frame.TopBar.CloseBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0.4}):Play() end)
-        MusicBtn.MouseButton1Click:Connect(function()
-            MusicFrame.Visible = not MusicFrame.Visible
-            MFrame.TopBar.ButtonHolder.MenuBtn.MenuFrame.Visible = false 
-        end)
-
-        local Sound = Instance.new("Sound")
-        Sound.Name = "Sound"
-        Sound.Parent = MusicFrame
-        Sound.Volume = 3
-        Sound:Stop()
-
-        local Sounds = {}
-        if not isfile(Config.FolderToSave .. "/music.txt") then writefile(Config.FolderToSave .. "/music.txt", tostring(http:JSONEncode({}))) end
-        Sounds = http:JSONDecode(readfile(Config.FolderToSave .. "/music.txt"))
-
-        function Save()
-            local content = {}
-            for i,v in pairs(Sounds) do
-                content[i] = v
-            end
-            writefile(Config.FolderToSave .. "/music.txt", tostring(http:JSONEncode(content)))
-        end    
-
-        local function PlaySong(id, title)
-            Sound:Stop()
-            playing = true
-            Sound.SoundId = "rbxassetid://" .. id
-            Sound:Resume()
-            MusicFrame.Frame.Play.Image = "http://www.roblox.com/asset/?id=6026663719"
-            MusicFrame.Frame.Title.Text = title
-        end    
-
-        local function RefreshList(list)
-            for i,v in next, MusicFrame.Frame.MusicList.Scroll:GetChildren() do
-                if v.Name == "Btn" then
-                    v:Destroy()
-                end    
-            end
-            for i,v in next, list do
-                local success, info = pcall(MarketplaceService.GetProductInfo, MarketplaceService, v)
-                if success and info.AssetTypeId == 3 then
-                    local Btn = MusicPreset:Clone()
-                    Btn.Parent = MusicFrame.Frame.MusicList.Scroll
-                    Btn.Title.Text = info.Name
-
-                    Btn.MouseButton1Click:Connect(function()
-                        PlaySong(v, info.Name)
-                    end)
-
-                    Btn.Delete.MouseButton1Click:Connect(function()
-                        for g,c in next, Sounds do
-                            if c == v then
-                                table.remove(Sounds, g)
-                            end    
-                        end    
-                        Save()
-                        Btn:Destroy()   
-                    end)
-                end
-            end    
-        end 
-        
-        MusicFrame.Frame.Play.MouseButton1Click:Connect(function()
-            playing = not playing
-            if playing then Sound:Pause() else Sound:Resume() end
-            MusicFrame.Frame.Play.Image = playing and "http://www.roblox.com/asset/?id=6026663699" or "http://www.roblox.com/asset/?id=6026663719"
-        end)
-
-        MusicFrame.Frame.AddBtn.MouseButton1Click:Connect(function()
-            local id = MusicFrame.Frame.AddSong.Text
-            if not table.find(Sounds, id) then
-                table.insert(Sounds, id)
-                Save()
-                RefreshList(Sounds)
-            end    
-        end)
-
-        MusicFrame.Frame.AddBtn.MouseEnter:Connect(function()
-            abuttonhold = true
-        end)
-
-        MusicFrame.Frame.AddBtn.MouseLeave:Connect(function()
-            abuttonhold = false
-        end)
-
-        RefreshList(Sounds)
-
-        game:GetService("RunService").RenderStepped:Connect(function()
-            local time = math.floor(Sound.TimePosition)
-            local timesecs = time % 60
-            local timemins = math.floor(time / 60)
-            if string.len(timesecs) < 2 then timesecs = "0" .. timesecs end
-            if string.len(timemins) < 2 then timemins = "0" .. timemins end
-            local timemax = math.floor(Sound.TimeLength)
-            local timemaxsecs = timemax % 60
-            local timemaxmins = math.floor(timemax / 60)
-            if string.len(timemaxsecs) < 2 then timemaxsecs = "0" .. timemaxsecs end
-            if string.len(timemaxmins) < 2 then timemaxmins = "0" .. timemaxmins end
-            MusicFrame.Frame.Timer1.Text = timemins .. ":" .. timesecs
-            MusicFrame.Frame.Timer2.Text = timemaxmins .. ":" .. timemaxsecs
-            MusicFrame.Frame.Progress.ProgressFrame.Size = UDim2.new(Sound.TimePosition / Sound.TimeLength,0,1,0)
-        end)
-
-        
-        spawn(function()
-            while wait() do
-                MusicFrame.Frame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].MainFrame
-                MusicFrame.Frame.TopBar.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-                MusicFrame.Frame.TopBar.CloseBtn.Ico.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                MusicFrame.Frame.MusicList.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-                MusicFrame.Frame.AddBtn.BackgroundColor3 = abuttonhold and SolarisLib.Themes[SolarisLib.Settings.Theme].ButtonHold or SolarisLib.Themes[SolarisLib.Settings.Theme].Button
-                MusicFrame.Frame.Progress.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Slider
-                MusicFrame.Frame.Progress.ProgressFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].SliderInc
-                MusicFrame.Frame.AddSong.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Textbox
-            end
-        end)
-    end  
-
-    function SettingsConstructor()
-        local Settings, SettingsFrame, TabPreset, ContainerPreset, TogglePreset, BindPreset, DropdownPreset, OptionPreset = {}, game:GetObjects("rbxassetid://7167491516")[1], game:GetObjects("rbxassetid://7177524915")[1], game:GetObjects("rbxassetid://7203599409")[1], game:GetObjects("rbxassetid://7208643984")[1], game:GetObjects("rbxassetid://7219277948")[1], game:GetObjects("rbxassetid://7435055269")[1], game:GetObjects("rbxassetid://7435032496")[1]
-        local fs = true
-        local SFrame = SettingsFrame.Main
-        SettingsFrame.Parent = MFrame
-        SFrame.TopBar.CloseBtn.MouseEnter:Connect(function() TweenService:Create(SFrame.TopBar.CloseBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0}):Play() end)
-        SFrame.TopBar.CloseBtn.MouseLeave:Connect(function() TweenService:Create(SFrame.TopBar.CloseBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0.4}):Play() end)
-        SettingsBtn.MouseButton1Click:Connect(function()
-            SettingsFrame.Visible = not SettingsFrame.Visible
-            MFrame.TopBar.ButtonHolder.MenuBtn.MenuFrame.Visible = false 
-        end)
-        SFrame.TopBar.CloseBtn.MouseButton1Click:Connect(function()
-            SettingsFrame.Visible = false
-        end)
-
-        function SaveSettings()
-            local content = {}
-            for i,v in pairs(SolarisLib.Settings) do
-                content[i] = v
-            end
-            writefile(Config.FolderToSave .. "/settings.txt", tostring(http:JSONEncode(content)))
-        end    
-
-        
-        spawn(function()
-            while wait() do
-                SFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].MainFrame
-                SFrame.TopBar.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-                SFrame.TopBar.CloseBtn.Ico.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                SFrame.TopBar.TopFrameTitle.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                SFrame.TabHolder.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-
-            end
-        end)
-
-        function Settings:Tab(text)
-            local Tab = TabPreset:Clone()
-            local Container = ContainerPreset:Clone()
-            Tab.Parent = SFrame.TabHolder
-            Tab.Text = text
-            Tab.Size = UDim2.new(0,Tab.TextBounds.X,1,0)
-            Container.Parent = SFrame.ContainerFolder
-            Container.Visible = false
-
-            if fs then
-                Tab.TextTransparency = 0
-                Container.Visible = true
-                fs = false
-            end    
-
-            Tab.MouseButton1Click:Connect(function()
-                for i,v in next, SFrame.TabHolder:GetChildren() do
-                    if v.Name == "Tab" then
-                        v.TextTransparency = 0.4
-                    end    
-                end      
-                for i,v in next, SFrame.ContainerFolder:GetChildren() do
-                    if v.Name == "Container" then
-                        v.Visible = false
-                    end    
-                end      
-                Tab.TextTransparency = 0      
-                Container.Visible = true
-            end)
-            local TabHold = {}
-            function TabHold:ToggleSetting(title, desc, def, path)
-                local value = SolarisLib.Settings[path] or def
-                local Toggle = TogglePreset:Clone()
-                Toggle.Parent = Container
-                Toggle.Title.Text = title
-                Toggle.Desc.Text = desc
-
-                local function Tween(val)
-                    TweenService:Create(Toggle.ToggleFrame.ToggleToggled.ToggleIco,TweenInfo.new(.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency= val and 0 or 1}):Play()
-                    TweenService:Create(Toggle.ToggleFrame.ToggleToggled.ToggleIco,TweenInfo.new(.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size= val and UDim2.new(1,-2,1,-2) or UDim2.new(1,-6,1,-6)}):Play()
-                end    
-
-                local function SetValue(val)
-                    Tween(val)
-                    SolarisLib.Settings[path] = val
-                    value = val
-                    SaveSettings()
-                end    
-
-                Tween(value)
-
-                Toggle.MouseButton1Click:Connect(function()
-                    SetValue(not value)     
-                end)
-
-                spawn(function()
-                    while wait() do
-                        Toggle.ToggleFrame.ToggleToggled.BackgroundColor3 = value and SolarisLib.Themes[SolarisLib.Settings.Theme].ToggleToggled or SolarisLib.Themes[SolarisLib.Settings.Theme].MainFrame
-                        Toggle.ToggleFrame.BackgroundColor3 = value and SolarisLib.Themes[SolarisLib.Settings.Theme].ToggleToggled or SolarisLib.Themes[SolarisLib.Settings.Theme].ToggleFrame
-                        Toggle.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
-            end
-            function TabHold:BindSetting(title, desc, def, path)
-                local value = SolarisLib.Settings[path] or def
-                local Bind = BindPreset:Clone()
-                Bind.Parent = Container
-                Bind.Title.Text = title
-                Bind.Desc.Text = desc
-
-                function SetValue(val)
-                    closebindbinding = false
-                    value = val or value
-                    value = value.Name or value
-                    Bind.BText.Text = value
-                    SolarisLib.Settings[path] = value
-                    SaveSettings()
-                end    
-                SetValue(value)
-
-                Bind.InputEnded:Connect(function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        if closebindbinding then return end
-                        closebindbinding = true
-                        Bind.BText.Text = "..."
-                    end
-                end)
-
-                UserInputService.InputBegan:Connect(function(Input)
-                    if UserInputService:GetFocusedTextBox() then return end
-                    if closebindbinding then
-                        local Key
-                        pcall(function()
-                            if not CheckKey(BlacklistedKeys, Input.KeyCode) then
-                                Key = Input.KeyCode
-                            end
-                        end)
-                        pcall(function()
-                            if CheckKey(WhitelistedMouse, Input.UserInputType) and not Key then
-                                Key = Input.UserInputType
-                            end
-                        end)
-                        Key = Key or value
-                        SetValue(Key)
-                    end
-                end)
-
-                spawn(function()
-                    while wait() do
-                        Bind.Desc.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                        Bind.BText.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                        Bind.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
-            
-            end    
-            function TabHold:Dropdown(title, desc, list, def, path)
-                local opened = false
-                local value = SolarisLib.Settings[path] or def
-                local Dropdown = DropdownPreset:Clone()
-                Dropdown.Parent = Container
-                Dropdown.Title.Text = title
-                Dropdown.Desc.Text = desc
-                Dropdown.Main.Current.Text = value
-
-                function Toggle()
-                    Dropdown.Main.Holder.Visible = opened
-                    Dropdown.Main.Holder.Size = opened and UDim2.new(1,0,0,Dropdown.Main.Holder.UIListLayout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,0)
-                    if opened then
-                        if (Dropdown.Main.Holder.UIListLayout.AbsoluteContentSize.Y + Container.UIListLayout.AbsoluteContentSize.Y) > 190 then
-                            Container.CanvasSize = UDim2.new(0,0,0,Dropdown.Main.Holder.UIListLayout.AbsoluteContentSize.Y + Container.UIListLayout.AbsoluteContentSize.Y)
-                        end    
-                    else
-                        Container.CanvasSize = UDim2.new(0,0,0,Container.UIListLayout.AbsoluteContentSize.Y) 
-                    end
-                    TweenService:Create(Dropdown.Main.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Rotation = opened and 180 or 0}):Play()
-                end   
-                
-                Dropdown.InputEnded:Connect(function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        opened = not opened
-                        Toggle()
-                    end
-                end)
-
-                local function AddOptions(opts)
-                    for _,option in pairs(opts) do
-                        local Option = OptionPreset:Clone()
-                        Option.Parent = Dropdown.Main.Holder
-                        Option.Text = option
-
-                        Option.MouseButton1Click:Connect(function()
-                            value = option
-                            SolarisLib.Settings[path] = value
-                            Dropdown.Main.Current.Text = value
-                            SaveSettings()
-                        end)
-
-                        spawn(function()
-                            while wait() do
-                               Option.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor       
-                            end
-                        end)
-                    end   
-                end    
-
-                spawn(function()
-                    while wait() do
-                        Dropdown.Main.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-                        Dropdown.Main.Holder.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-                    end
-                end)
-                AddOptions(list)
-            end
-            return TabHold
-        end   
-        
-        local general = Settings:Tab("General")
-        general:ToggleSetting("Show Music On Launch", "Shows the music menu when you load Space Hub", true, "ShowMusicOnLaunch")
-        general:BindSetting("Close Bind", "Hides/Shows the main window when pressed.", Enum.KeyCode.RightControl, "CloseBind")
-        
-        local appearance = Settings:Tab("Appearance")
-        appearance:Dropdown("Theme", "The look of the user interface", {"Default", "Discord", "Red", "Green", "Blue"}, "Default", "Theme")
-
-    end 
-    MusicConstructor()
-    SettingsConstructor()
-
-    local function OpenTabMenu()
-        TweenService:Create(MFrame.TabMenu,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Position = UDim2.new(0,0,0,0)}):Play() 
-    end   
-    
-    local function CloseTabMenu()
-        TweenService:Create(MFrame.TabMenu,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Position = UDim2.new(-0.37, -8, 0, 0)}):Play() 
-    end 
-
-    MFrame.TopBar.TabListBtn.MouseButton1Click:Connect(function()
-        OpenTabMenu()
-    end)
-
-    MFrame.TabMenu.Menu.Top.MenuCloseBtn.MouseButton1Click:Connect(function()
-        CloseTabMenu()
-    end)
-
-    MFrame.TopBar.ButtonHolder.SearchBtn.MouseButton1Click:Connect(function()
-        MFrame.TopBar.ButtonHolder.SearchBtn.TextBox.Visible = not MFrame.TopBar.ButtonHolder.SearchBtn.TextBox.Visible
-        MFrame.TopBar.TopFrameTitle.Visible = not MFrame.TopBar.TopFrameTitle.Visible
-    end)
-
-    MFrame.TopBar.ButtonHolder.CloseBtn.MouseEnter:Connect(function() TweenService:Create(MFrame.TopBar.ButtonHolder.CloseBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0}):Play() end)
-    MFrame.TopBar.ButtonHolder.CloseBtn.MouseLeave:Connect(function() TweenService:Create(MFrame.TopBar.ButtonHolder.CloseBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0.4}):Play() end)
-    MFrame.TopBar.ButtonHolder.SearchBtn.MouseEnter:Connect(function() TweenService:Create(MFrame.TopBar.ButtonHolder.SearchBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0}):Play() end)
-    MFrame.TopBar.ButtonHolder.SearchBtn.MouseLeave:Connect(function() TweenService:Create(MFrame.TopBar.ButtonHolder.SearchBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0.4}):Play() end)
-    MFrame.TopBar.ButtonHolder.MenuBtn.MouseEnter:Connect(function() TweenService:Create(MFrame.TopBar.ButtonHolder.MenuBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0}):Play() end)
-    MFrame.TopBar.ButtonHolder.MenuBtn.MouseLeave:Connect(function() TweenService:Create(MFrame.TopBar.ButtonHolder.MenuBtn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0.4}):Play() end)
-    MFrame.TopBar.TabListBtn.MouseEnter:Connect(function() TweenService:Create(MFrame.TopBar.TabListBtn,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0}):Play() end)
-    MFrame.TopBar.TabListBtn.MouseLeave:Connect(function() TweenService:Create(MFrame.TopBar.TabListBtn,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency = 0.4}):Play() end)
-    MFrame.TopBar.ButtonHolder.MenuBtn.MouseButton1Click:Connect(function() MFrame.TopBar.ButtonHolder.MenuBtn.MenuFrame.Visible = not MFrame.TopBar.ButtonHolder.MenuBtn.MenuFrame.Visible end)
-
-    MFrame.TopBar.ButtonHolder.CloseBtn.MouseButton1Click:Connect(function()
-        uitoggled = not uitoggled
-        MainUI.Visible = uitoggled
-    end)
-
-
-    function SearchConstructor()
-        function StitchElements()
-            local elms = {}
-            for i,v in next, SolarisLib.CurrentTab:GetDescendants() do
-                if string.find(v.Name, "element") then
-                    table.insert(elms, v)        
-                end
-            end   
-            return elms
-        end    
-
-        MFrame.TopBar.ButtonHolder.SearchBtn.TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-            for i,v in pairs(StitchElements()) do
-                if string.len(MFrame.TopBar.ButtonHolder.SearchBtn.TextBox.Text) >= 1 then
-                    if string.find(string.sub(v.Name:lower(),0,-8), MFrame.TopBar.ButtonHolder.SearchBtn.TextBox.Text:lower()) then
-                        v.Visible = true
-                    else
-                        v.Visible = false
-                    end 
+                if toggled then
+					pcall(self2.container.TweenPosition, self2.container, savedposition, "Out", "Sine", 0.5, true)
                 else
-                    v.Visible = true                 
-                end
-            end    		
-        end)
-    end    
+                    savedposition = self2.container.Position;
+					pcall(self2.container.TweenPosition, self2.container, UDim2.new(savedposition.Width.Scale, savedposition.Width.Offset, 1.5, 0), "Out", "Sine", 0.5, true)
+				end
+			end
+		end)
+	end
+	
+	self2.ChangeBackgroundImage = function(ImageID, Transparency)
+		self2.container.Image = ImageID
+		
+		if Transparency then
+			self2.container.ImageTransparency = Transparency
+		else
+			self2.container.ImageTransparency = 0.8
+		end
+	end
 
-    SearchConstructor()
-    
+	finityData.UpConnection = finity.gs["UserInputService"].InputEnded:Connect(function(Input)
+		if Input.KeyCode == finityData.ToggleKey and not typing then
+			toggled = not toggled
 
-	UserInputService.InputBegan:Connect(function(Input)
-		if (Input.KeyCode.Name == SolarisLib.Settings.CloseBind or Input.UserInputType.Name == SolarisLib.Settings.CloseBind) and not closebindbinding then
-            uitoggled = not uitoggled
-            MainUI.Visible = uitoggled
+			if toggled then
+				self2.container:TweenPosition(UDim2.new(0.5, 0, 0.5, 0), "Out", "Sine", 0.5, true)
+			else
+				self2.container:TweenPosition(UDim2.new(0.5, 0, 1.5, 0), "Out", "Sine", 0.5, true)
+			end
 		end
 	end)
 
-    spawn(function()
-        while wait() do
-            MFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].MainFrame
-            MFrame.TopBar.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-            MFrame.TopBar.ButtonHolder.CloseBtn.Ico.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TopBar.ButtonHolder.MenuBtn.Ico.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TopBar.ButtonHolder.SearchBtn.Ico.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TopBar.TabListBtn.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TopBar.TopFrameTitle.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TabMenu.Menu.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Menu
-            MFrame.TabMenu.Menu.Top.MenuCloseBtn.ImageLabel.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TopBar.ButtonHolder.SearchBtn.TextBox.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].MainFrame
-            MFrame.TopBar.ButtonHolder.SearchBtn.TextBox.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TopBar.ButtonHolder.SearchBtn.TextBox.PlaceholderColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-            MFrame.TopBar.ButtonHolder.MenuBtn.MenuFrame.Frame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TopBar
-        end
-    end)
+	self2.userinterface = self:Create("ScreenGui", {
+		Name = "FinityUI",
+		ZIndexBehavior = Enum.ZIndexBehavior.Global,
+		ResetOnSpawn = false,
+	})
 
-    function SolarisLib:LoadCfg(cfg)
-        local content = http:JSONDecode(cfg)
-        table.foreach(content, function(a,b)
-            if SolarisLib.Flags[a] then
-                spawn(function() SolarisLib.Flags[a]:Set(b) end)
-            else
-                warn("cfg loader - could not find", a ,b )
-            end
-        end)
-    end
+	self2.container = self:Create("ImageLabel", {
+		Draggable = true,
+		Active = true,
+		Name = "Container",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 0,
+		BackgroundColor3 = theme.main_container,
+		BorderSizePixel = 0,
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, 800, 0, 500),
+		ZIndex = 2,
+		ImageTransparency = 1
+    })
     
-    function SolarisLib:SaveCfg(name)
-        local content = {}
-        for i,v in pairs(SolarisLib.Flags) do
-            content[i] = v.Value
-        end
-        writefile(Config.FolderToSave .. "/configs/" .. name .. ".txt", tostring(http:JSONEncode(content)))
-    end
-    
+    self2.modal = self:Create("TextButton", {
+        Text = "";
+        Transparency = 1;
+        Modal = true;
+    }) self2.modal.Parent = self2.userinterface;
+	
+	if thinProject and typeof(thinProject) == "UDim2" then
+		self2.container.Size = thinProject
+	end
 
-    local TabHolder = {}
-    function TabHolder:Tab(text)
-        local Tab = TabPreset:Clone()
-        Tab.AutoButtonColor = false
-        Tab.Parent = MFrame.TabMenu.Menu.Holder
-        Tab.Text =  text
-        Tab.TextSize = 14
+	self2.container.Draggable = true
+	self2.container.Active = true
 
+	self2.sidebar = self:Create("Frame", {
+		Name = "Sidebar",
+		BackgroundColor3 = Color3.new(0.976471, 0.937255, 1),
+		BackgroundTransparency = 1,
+		BorderColor3 = Color3.new(0.745098, 0.713726, 0.760784),
+		Size = UDim2.new(0, 120, 1, -30),
+		Position = UDim2.new(0, 0, 0, 30),
+		ZIndex = 2,
+	})
 
-        local Container =  ContainerPreset:Clone()
-        Container.Parent = MFrame.ContainerFolder
-        Container.Visible = false
+	self2.categories = self:Create("Frame", {
+		Name = "Categories",
+		BackgroundColor3 = Color3.new(0.976471, 0.937255, 1),
+		ClipsDescendants = true,
+		BackgroundTransparency = 1,
+		BorderColor3 = Color3.new(0.745098, 0.713726, 0.760784),
+		Size = UDim2.new(1, -120, 1, -30),
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, 0, 0, 30),
+		ZIndex = 2,
+	})
+	self2.categories.ClipsDescendants = true
 
-        if fs == false then
-            fs = true
-            Container.Visible = true
-            Tab.UIPadding.PaddingLeft = UDim.new(0,10)
-            Tab.TextTransparency = 0
-            Tab.BackgroundTransparency = 0  
-            SolarisLib.CurrentTab = Container  
-        end    
+	self2.topbar = self:Create("Frame", {
+		Name = "Topbar",
+		ZIndex = 2,
+		Size = UDim2.new(1,0,0,30),
+		BackgroundTransparency = 2
+	})
 
-        spawn(function()
-            while wait() do
-                Tab.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                Tab.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TabToggled
-                Container.CanvasSize = UDim2.new(0,0,0,Container.UIListLayout.AbsoluteContentSize.Y + 26)
-            end
-        end)
+	self2.tip = self:Create("TextLabel", {
+		Name = "TopbarTip",
+		ZIndex = 2,
+		Size = UDim2.new(1, -30, 0, 30),
+		Position = UDim2.new(0, 30, 0, 0),
+		Text = "Press '".. string.sub(tostring(self.ToggleKey), 14) .."' to hide this menu",
+		Font = Enum.Font.GothamSemibold,
+		TextSize = 13,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		BackgroundTransparency = 1,
+		TextColor3 = theme.text_color,
+	})
+	
+	if projectName then
+		self2.tip.Text = projectName
+	else
+		self2.tip.Text = "Press '".. string.sub(tostring(self.ToggleKey), 14) .."' to hide this menu"
+	end
+	
+	local separator = self:Create("Frame", {
+		Name = "Separator",
+		BackgroundColor3 = theme.separator_color,
+		BorderSizePixel = 0,
+		Position = UDim2.new(0, 118, 0, 30),
+		Size = UDim2.new(0, 1, 1, -30),
+		ZIndex = 6,
+	})
+	separator.Parent = self2.container
+	separator = nil
 
+	local separator = self:Create("Frame", {
+		Name = "Separator",
+		BackgroundColor3 = theme.separator_color,
+		BorderSizePixel = 0,
+		Position = UDim2.new(0, 0, 0, 30),
+		Size = UDim2.new(1, 0, 0, 1),
+		ZIndex = 6,
+	})
+	separator.Parent = self2.container
+	separator = nil
 
-        
-        Tab.MouseButton1Click:Connect(function()
-            for i,v in next, MFrame.TabMenu.Menu.Holder:GetChildren() do
-                if v:IsA("TextButton") then
-                    TweenService:Create(v,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0.4}):Play() 
-                    TweenService:Create(v,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 1}):Play() 
-                    TweenService:Create(v.UIPadding,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{PaddingLeft = UDim.new(0,5)}):Play() 
-                end    
-                TweenService:Create(Tab,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{TextTransparency = 0}):Play() 
-                TweenService:Create(Tab,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{BackgroundTransparency = 0}):Play() 
-                TweenService:Create(Tab.UIPadding,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{PaddingLeft = UDim.new(0,10)}):Play() 
-            end   
-            for i,v in next, MFrame.ContainerFolder:GetChildren() do
-                if v.Name == "Container" then
-                    v.Visible = false
-                end    
-                Container.Visible = true
-            end
-            tabtoggledname = Tab.Name
-            CloseTabMenu()
-        end)
+	local uipagelayout = self:Create("UIPageLayout", {
+		Padding = UDim.new(0, 10),
+		FillDirection = Enum.FillDirection.Vertical,
+		TweenTime = 0.7,
+		EasingStyle = Enum.EasingStyle.Quad,
+		EasingDirection = Enum.EasingDirection.InOut,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	})
+	uipagelayout.Parent = self2.categories
+	uipagelayout = nil
 
+	local uipadding = self:Create("UIPadding", {
+		PaddingTop = UDim.new(0, 3),
+		PaddingLeft = UDim.new(0, 2)
+	})
+	uipadding.Parent = self2.sidebar
+	uipadding = nil
 
-        local SectionHold = {}
-        function SectionHold:Section(text)
-            local Section = SectionPreset:Clone()
-            Section.Parent = Container
-            Section.SectionTitle.Text = text
+	local uilistlayout = self:Create("UIListLayout", {
+		SortOrder = Enum.SortOrder.LayoutOrder
+	})
+	uilistlayout.Parent = self2.sidebar
+	uilistlayout = nil
 
-            spawn(function()
-                while wait() do
-                    Section.SectionTitle.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    Section.Size = UDim2.new(0.9,0,0,Section.UIListLayout.AbsoluteContentSize.Y)
-                end
-            end)
-            local ItemHold = {}
-            function ItemHold:Button(text,callback)
-                local Holding = false
-                local Button = game:GetObjects("rbxassetid://6937142338")[1]
-                Button.Parent = Section
-                Button.Name = text .. "element"
-                Button.ButtonText.Text = text
-                Button.ClipsDescendants = true
-                
-                Button.MouseButton1Click:Connect(function()
-                    callback()
-                    Ripple(Button)
-                end)
-                Button.MouseEnter:Connect(function()
-                    Holding = true
-                end)
-                Button.MouseLeave:Connect(function()
-                    Holding = false
-                end)
+	function self2:Category(name)
+		local category = {}
+		
+		category.button = finity:Create("TextButton", {
+			Name = name,
+			BackgroundColor3 = theme.category_button_background,
+			BackgroundTransparency = 1,
+			BorderMode = Enum.BorderMode.Inset,
+			BorderColor3 = theme.category_button_border,
+			Size = UDim2.new(1, -4, 0, 25),
+			ZIndex = 2,
+			AutoButtonColor = false,
+			Font = Enum.Font.GothamSemibold,
+			Text = name,
+			TextColor3 = theme.text_color,
+			TextSize = 14
+		})
 
-                spawn(function()
-                    while wait() do
-                       Button.BackgroundColor3 = Holding and SolarisLib.Themes[SolarisLib.Settings.Theme].ButtonHold or SolarisLib.Themes[SolarisLib.Settings.Theme].Button
-                       Button.ButtonText.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
+		category.container = finity:Create("ScrollingFrame", {
+			Name = name,
+			BackgroundTransparency = 1,
+			ScrollBarThickness = 4,
+			BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+			ZIndex = 2,
+			CanvasSize = UDim2.new(0, 0, 0, 0),
+			ScrollBarImageColor3 = theme.scrollbar_color or Color3.fromRGB(118, 118, 121),
+			BottomImage = "rbxassetid://967852042",
+			MidImage = "rbxassetid://967852042",
+			TopImage = "rbxassetid://967852042",
+			ScrollBarImageTransparency = 1 --
+		})
 
-            end    
-            function ItemHold:Toggle(text,def,flag,callback)
-                local Toggle,ToggleMain = {Value = false}, game:GetObjects("rbxassetid://6963155498")[1]
-                ToggleMain.Parent = Section
-                ToggleMain.ToggleText.Text = text
-                ToggleMain.Name = text .. "element"
+		category.hider = finity:Create("Frame", {
+			Name = "Hider",
+			BackgroundTransparency = 0, --
+			BorderSizePixel = 0,
+			BackgroundColor3 = theme.main_container,
+			Size = UDim2.new(1, 0, 1, 0),
+			ZIndex = 5
+		})
 
-                function Toggle:Set(value)
-					Toggle.Value = value
-                    TweenService:Create(ToggleMain.ToggleFrame.ToggleToggled.ToggleIco,TweenInfo.new(.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{ImageTransparency= Toggle.Value and 0 or 1}):Play()
-                    TweenService:Create(ToggleMain.ToggleFrame.ToggleToggled.ToggleIco,TweenInfo.new(.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size= Toggle.Value and UDim2.new(1,-2,1,-2) or UDim2.new(1,-6,1,-6)}):Play()
-					return callback(Toggle.Value)
+		category.L = finity:Create("Frame", {
+			Name = "L",
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0, 10, 0, 3),
+			Size = UDim2.new(0.5, -20, 1, -3),
+			ZIndex = 2
+		})
+		
+		if not thinProject then
+			category.R = finity:Create("Frame", {
+				Name = "R",
+				AnchorPoint = Vector2.new(1, 0),
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BackgroundTransparency = 1,
+				Position = UDim2.new(1, -10, 0, 3),
+				Size = UDim2.new(0.5, -20, 1, -3),
+				ZIndex = 2
+			})
+		end
+		
+		if thinProject then
+			category.L.Size = UDim2.new(1, -20, 1, -3)
+		end
+		
+		if firstCategory then
+			finity.gs["TweenService"]:Create(category.hider, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+			finity.gs["TweenService"]:Create(category.container, TweenInfo.new(0.3), {ScrollBarImageTransparency = 0}):Play()
+		end
+		
+		do
+			local uilistlayout = finity:Create("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder
+			})
+	
+			local uilistlayout2 = finity:Create("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder
+			})
+			
+			local function computeSizeChange()
+				local largestListSize = 0
+				
+				largestListSize = uilistlayout.AbsoluteContentSize.Y
+				
+				if uilistlayout2.AbsoluteContentSize.Y > largestListSize then
+					largestListSize = largestListSize
 				end
 				
-				ToggleMain.MouseButton1Click:Connect(function()
-					Toggle.Value = not Toggle.Value
-					Toggle:Set(Toggle.Value)           
-				end)
-
-                spawn(function()
-                    while wait() do
-                        ToggleMain.ToggleFrame.ToggleToggled.BackgroundColor3 = Toggle.Value and SolarisLib.Themes[SolarisLib.Settings.Theme].ToggleToggled or SolarisLib.Themes[SolarisLib.Settings.Theme].Toggle
-                        ToggleMain.ToggleFrame.BackgroundColor3 = Toggle.Value and SolarisLib.Themes[SolarisLib.Settings.Theme].ToggleToggled or SolarisLib.Themes[SolarisLib.Settings.Theme].ToggleFrame
-                        ToggleMain.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Toggle
-                        ToggleMain.ToggleText.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
-
-				Toggle:Set(def)
-                SolarisLib.Flags[flag] = Toggle
-                return Toggle
-            end    
-            function ItemHold:Slider(text,min,max,start,inc,flag,callback)
-                local Slider,SliderMain = {Value = start}, game:GetObjects("rbxassetid://6967573727")[1]
-                SliderMain.Parent = Section
-                SliderMain.SliderText.Text = text
-                SliderMain.Name = text .. "element"
-                local dragging = false
-
-                local function move(Input)
-                    local XSize = math.clamp((Input.Position.X - SliderMain.SliderFrame.AbsolutePosition.X) / SliderMain.SliderFrame.AbsoluteSize.X, 0, 1)
-                    local Increment = inc and (max / ((max - min) / (inc * 4))) or (max >= 50 and max / ((max - min) / 4)) or (max >= 25 and max / ((max - min) / 2)) or (max / (max - min))
-                    local SizeRounded = UDim2.new((math.round(XSize * ((max / Increment) * 4)) / ((max / Increment) * 4)), 0, 1, 0) 
-                    TweenService:Create(SliderMain.SliderFrame.SliderCurrentFrame,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = SizeRounded}):Play() 
-                    local Val = math.round((((SizeRounded.X.Scale * max) / max) * (max - min) + min) * 20) / 20
-                    SliderMain.SliderVal.Text = tostring(Val)
-                    Slider.Value = Val
-                    callback(Slider.Value)
+				category.container.CanvasSize = UDim2.new(0, 0, 0, largestListSize + 5)
+			end
+			
+			uilistlayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(computeSizeChange)
+			uilistlayout2:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(computeSizeChange)
+			
+			uilistlayout.Parent = category.L
+			uilistlayout2.Parent = category.R
+		end
+		
+		category.button.MouseEnter:Connect(function()
+			finity.gs["TweenService"]:Create(category.button, TweenInfo.new(0.2), {BackgroundTransparency = 0.5}):Play()
+		end)
+		category.button.MouseLeave:Connect(function()
+			finity.gs["TweenService"]:Create(category.button, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+		end)
+		category.button.MouseButton1Down:Connect(function()
+			for _, categoryf in next, self2.userinterface["Container"]["Categories"]:GetChildren() do
+				if categoryf:IsA("ScrollingFrame") then
+					if categoryf ~= category.container then
+						finity.gs["TweenService"]:Create(categoryf.Hider, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
+						finity.gs["TweenService"]:Create(categoryf, TweenInfo.new(0.3), {ScrollBarImageTransparency = 1}):Play()
+					end
 				end
-				SliderMain.SliderFrame.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true end end)
-				SliderMain.SliderFrame.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
-				game:GetService("UserInputService").InputChanged:Connect(function(input) if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then move(input) end end)
+			end
 
-                function Slider:Set(val)
-                    local a = tostring(val and (val / max) * (max - min) + min) or 0
-					SliderMain.SliderVal.Text = tostring(a)
-                    SliderMain.SliderFrame.SliderCurrentFrame.Size = UDim2.new((val or 0) / max, 0, 1, 0)
-                    Slider.Value = val
-					return callback(Slider.Value)
-				end	
+			finity.gs["TweenService"]:Create(category.button, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
+			finity.gs["TweenService"]:Create(category.hider, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+			finity.gs["TweenService"]:Create(category.container, TweenInfo.new(0.3), {ScrollBarImageTransparency = 0}):Play()
 
-                spawn(function()
-                    while wait() do
-                       SliderMain.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Slider
-                       SliderMain.SliderFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].SliderBar
-                       SliderMain.SliderFrame.SliderCurrentFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].SliderInc
-                       SliderMain.SliderText.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                       SliderMain.SliderVal.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
+			self2.categories["UIPageLayout"]:JumpTo(category.container)
+		end)
+		category.button.MouseButton1Up:Connect(function()
+			finity.gs["TweenService"]:Create(category.button, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+		end)
+
+		category.container.Parent = self2.categories
+		category.button.Parent = self2.sidebar
+		
+		if not thinProject then
+			category.R.Parent = category.container
+		end
+		
+		category.L.Parent = category.container
+		category.hider.Parent = category.container
+
+		local function calculateSector()
+			if thinProject then
+				return "L"
+			end
+			
+			local R = #category.R:GetChildren() - 1
+			local L = #category.L:GetChildren() - 1
+
+			if L > R then
+				return "R"
+			else
+				return "L"
+			end
+		end
+
+		function category:Sector(name)
+			local sector = {}
+
+			sector.frame = finity:Create("Frame", {
+				Name = name,
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 0, 25),
+				ZIndex = 2
+			})
+
+			sector.container = finity:Create("Frame", {
+				Name = "Container",
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0, 0, 0, 22),
+				Size = UDim2.new(1, -5, 1, -30),
+				ZIndex = 2
+			})
+
+			sector.title = finity:Create("TextLabel", {
+				Name = "Title",
+				Text = name,
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -5, 0, 25),
+				ZIndex = 2,
+				Font = Enum.Font.GothamSemibold,
+				TextColor3 = theme.text_color,
+				TextSize = 14,
+				TextXAlignment = Enum.TextXAlignment.Left,
+			})
+
+			local uilistlayout = finity:Create("UIListLayout", {
+				SortOrder = Enum.SortOrder.LayoutOrder
+			})
+
+            uilistlayout.Changed:Connect(function()
+                pcall(function()
+                    sector.frame.Size = UDim2.new(1, 0, 0, sector.container["UIListLayout"].AbsoluteContentSize.Y + 25)
+                    sector.container.Size = UDim2.new(1, 0, 0, sector.container["UIListLayout"].AbsoluteContentSize.Y)
                 end)
+			end)
+			uilistlayout.Parent = sector.container
+			uilistlayout = nil
 
+			function sector:Cheat(kind, name, callback, data)
+				local cheat = {}
+				cheat.value = nil
 
-                Slider:Set(start)
-                SolarisLib.Flags[flag] = Slider
-                return Slider
-            end    
-            function ItemHold:Dropdown(text,list,def,flag,callback)
-                local Dropdown,DropMain,OptionPreset = {Value = nil, Toggled = false, Options = list}, game:GetObjects("rbxassetid://7027964359")[1], game:GetObjects("rbxassetid://7021432326")[1]
-                DropMain.Parent = Section
-                DropMain.Btn.Title.Text = text
-                DropMain.Name = text .. "element"
-                
+				cheat.frame = finity:Create("Frame", {
+					Name = name,
+					BackgroundColor3 = Color3.new(1, 1, 1),
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 0, 25),
+					ZIndex = 2,
+				})
 
-                local function ToggleDrop()
-                    Dropdown.Toggled = not Dropdown.Toggled
-                    DropMain.Holder.Size = Dropdown.Toggled and UDim2.new(1,0,0,6+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,0)
-                    TweenService:Create(DropMain,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Dropdown.Toggled and UDim2.new(1,0,0,38+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,32)}):Play() 
-                    TweenService:Create(DropMain.Btn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Rotation = Dropdown.Toggled and 180 or 0}):Play() 
-                    DropMain.Holder.Visible = Dropdown.Toggled
-                end  
+				cheat.label = finity:Create("TextLabel", {
+					Name = "Title",
+					BackgroundColor3 = Color3.new(1, 1, 1),
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					ZIndex = 2,
+					Font = Enum.Font.Gotham,
+					TextColor3 = theme.text_color,
+					TextSize = 13,
+					Text = name,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
 
-                local function AddOptions(opts)
-                    for _,option in pairs(opts) do
-                        local Option = OptionPreset:Clone()
-                        Option.Parent = DropMain.Holder
-                        Option.ItemText.Text = option
-                        Option.ClipsDescendants = true
-
-                        Option.MouseButton1Click:Connect(function()
-                            Dropdown.Value = option
-                            DropMain.Btn.Title.Text = text .. " - " .. option
-                            Ripple(Option)
-                            return callback(Dropdown.Value)
-                        end)
-
-                        spawn(function()
-                            while wait() do
-                               Option.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].DropdownItem
-                               DropMain.Btn.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                            end
-                        end)
-                    end   
-                end    
-
-                function Dropdown:Refresh(opts,del)
-                    if del then
-                        for _,v in pairs(DropMain.Holder:GetChildren()) do
-                            if v:IsA"TextButton" then
-								v:Destroy()
-                                DropMain.Holder.Size = Dropdown.Toggled and UDim2.new(1,0,0,6+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,0)
-                                DropMain.Size = Dropdown.Toggled and UDim2.new(1,0,0,38+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,32)
+				cheat.container	= finity:Create("Frame", {
+					Name = "Container",
+					AnchorPoint = Vector2.new(1, 0.5),
+					BackgroundColor3 = Color3.new(1, 1, 1),
+					BackgroundTransparency = 1,
+					Position = UDim2.new(1, 0, 0.5, 0),
+					Size = UDim2.new(0, 150, 0, 22),
+					ZIndex = 2,
+				})
+				
+				if kind then
+					if string.lower(kind) == "checkbox" or string.lower(kind) == "toggle" then
+						if data then
+							if data.enabled then
+								cheat.value = true
 							end
-                        end    
-                    end    
-                    AddOptions(opts)
-                end    
-             
+						end
 
-                DropMain.Btn.MouseButton1Click:Connect(function()
-                    ToggleDrop()
-                end)
+						cheat.checkbox = finity:Create("Frame", {
+							Name = "Checkbox",
+							AnchorPoint = Vector2.new(1, 0),
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(1, 0, 0, 0),
+							Size = UDim2.new(0, 25, 0, 25),
+							ZIndex = 2,
+						})
 
-                function Dropdown:Set(val)
-					Dropdown.Value = val
-                    DropMain.Btn.Title.Text = text .. " - " .. val
-					return callback(Dropdown.Value)
-				end
+						cheat.outerbox = finity:Create("ImageLabel", {
+							Name = "Outer",
+							AnchorPoint = Vector2.new(1, 0.5),
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(1, 0, 0.5, 0),
+							Size = UDim2.new(0, 20, 0, 20),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.checkbox_outer,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.06,
+						})
 
-                spawn(function()
-                    while wait() do
-                       DropMain.Btn.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Dropdown
-                       DropMain.Btn.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                       DropMain.Btn.Ico.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
+						cheat.checkboxbutton = finity:Create("ImageButton", {
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							Name = "CheckboxButton",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0.5, 0, 0.5, 0),
+							Size = UDim2.new(0, 14, 0, 14),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.checkbox_inner,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.04
+						})
 
-                Dropdown:Refresh(list,false)
-                Dropdown:Set(def)
-                SolarisLib.Flags[flag] = Dropdown
-                return Dropdown
-            end   
-            function ItemHold:MultiDropdown(text,list,def,flag,callback)
-                local Dropdown,DropMain,OptionPreset = {Value = {}, Toggled = false, Options = list}, game:GetObjects("rbxassetid://7027964359")[1], game:GetObjects("rbxassetid://7021432326")[1]
-                DropMain.Parent = Section
-                DropMain.Btn.Title.Text = text
-                DropMain.Name = text .. "element"
-                
+						if data then
+							if data.enabled then
+								finity.gs["TweenService"]:Create(cheat.outerbox, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_checked}):Play()
+								finity.gs["TweenService"]:Create(cheat.checkboxbutton, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_checked}):Play()
+							end
+						end
 
-                local function ToggleDrop()
-                    Dropdown.Toggled = not Dropdown.Toggled
-                    DropMain.Holder.Size = Dropdown.Toggled and UDim2.new(1,0,0,6+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,0)
-                    TweenService:Create(DropMain,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Dropdown.Toggled and UDim2.new(1,0,0,38+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,32)}):Play() 
-                    TweenService:Create(DropMain.Btn.Ico,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Rotation = Dropdown.Toggled and 180 or 0}):Play() 
-                    DropMain.Holder.Visible = Dropdown.Toggled
-                end  
-
-                local function AddOptions(opts)
-                    for _,option in pairs(opts) do
-                        local Option = OptionPreset:Clone()
-                        Option.Parent = DropMain.Holder
-                        Option.ItemText.Text = option
-                        Option.ClipsDescendants = true
-
-                        Option.MouseButton1Click:Connect(function()
-                            if table.find(Dropdown.Value, option) then				
-								table.remove(Dropdown.Value, table.find(Dropdown.Value, option))
-								DropMain.Btn.Title.Text = text .. " - " .. table.concat(Dropdown.Value, ", ")
-								callback(Dropdown.Value)
+						cheat.checkboxbutton.MouseEnter:Connect(function()
+							local lightertheme = Color3.fromRGB((theme.checkbox_outer.R * 255) + 20, (theme.checkbox_outer.G * 255) + 20, (theme.checkbox_outer.B * 255) + 20)
+							finity.gs["TweenService"]:Create(cheat.outerbox, TweenInfo.new(0.2), {ImageColor3 = lightertheme}):Play()
+						end)
+						cheat.checkboxbutton.MouseLeave:Connect(function()
+							if not cheat.value then
+								finity.gs["TweenService"]:Create(cheat.outerbox, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_outer}):Play()
 							else
-								table.insert(Dropdown.Value, option)
-								DropMain.Btn.Title.Text = text .. " - " .. table.concat(Dropdown.Value, ", ")
-								callback(Dropdown.Value)
+								finity.gs["TweenService"]:Create(cheat.outerbox, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_checked}):Play()
 							end
-                            Ripple(Option)
-                        end)
+						end)
+						cheat.checkboxbutton.MouseButton1Down:Connect(function()
+							if cheat.value then
+								finity.gs["TweenService"]:Create(cheat.checkboxbutton, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_outer}):Play()
+							else
+								finity.gs["TweenService"]:Create(cheat.checkboxbutton, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_checked}):Play()
+							end
+						end)
+						cheat.checkboxbutton.MouseButton1Up:Connect(function()
+							cheat.value = not cheat.value
 
-                        spawn(function()
-                            while wait() do
-                               Option.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].DropdownItem
-                               DropMain.Btn.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
+							if callback then
+								local s, e = pcall(function()
+									callback(cheat.value)
+								end)
+
+								if not s then warn("error: ".. e) end
+							end
+
+							if cheat.value then
+								finity.gs["TweenService"]:Create(cheat.outerbox, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_checked}):Play()
+							else
+								finity.gs["TweenService"]:Create(cheat.outerbox, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_outer}):Play()
+								finity.gs["TweenService"]:Create(cheat.checkboxbutton, TweenInfo.new(0.2), {ImageColor3 = theme.checkbox_inner}):Play()
+							end
+						end)
+
+						cheat.checkboxbutton.Parent = cheat.outerbox
+                        cheat.outerbox.Parent = cheat.container
+                    elseif string.lower(kind) == "color" or string.lower(kind) == "colorpicker" then
+                        cheat.value = Color3.new(1, 1, 1);
+
+						if data then
+							if data.color then
+								cheat.value = data.color
+							end
+                        end
+                        
+                        local hsvimage = "rbxassetid://4613607014"
+                        local lumienceimage = "rbxassetid://4613627894"
+                        
+                        cheat.hsvbar = finity:Create("ImageButton", {
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							Name = "HSVBar",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0.5, 0, 0.5, 0),
+							Size = UDim2.new(1, 0, 0, 6),
+							ZIndex = 2,
+                            Image = hsvimage
+                        })
+
+                        cheat.arrowpreview = finity:Create("ImageLabel", {
+                            Name = "ArrowPreview",
+                            BackgroundColor3 = Color3.new(1, 1, 1),
+                            BackgroundTransparency = 1,
+                            ImageTransparency = 0.25,
+                            Position = UDim2.new(0.5, 0, 0.5, -6),
+                            Size = UDim2.new(0, 6, 0, 6),
+                            ZIndex = 3,
+                            Image = "rbxassetid://2500573769",
+                            Rotation = -90
+                        })
+                        
+                        cheat.hsvbar.MouseButton1Down:Connect(function()
+                            local rs = finity.gs["RunService"]
+                            local uis = finity.gs["UserInputService"]local last = cheat.value;
+
+                            cheat.hsvbar.Image = hsvimage
+
+                            while uis:IsMouseButtonPressed'MouseButton1' do
+                                local mouseloc = uis:GetMouseLocation()
+                                local sx = cheat.arrowpreview.AbsoluteSize.X / 2;
+                                local offset = (mouseloc.x - cheat.hsvbar.AbsolutePosition.X) - sx
+                                local scale = offset / cheat.hsvbar.AbsoluteSize.X
+                                local position = math.clamp(offset, -sx, cheat.hsvbar.AbsoluteSize.X - sx) / cheat.hsvbar.AbsoluteSize.X
+
+                                finity.gs["TweenService"]:Create(cheat.arrowpreview, TweenInfo.new(0.1), {Position = UDim2.new(position, 0, 0.5, -6)}):Play()
+                                
+                                cheat.value = Color3.fromHSV(math.clamp(scale, 0, 1), 1, 1)
+
+                                if cheat.value ~= last then
+                                    last = cheat.value
+                                    
+                                    if callback then
+                                        local s, e = pcall(function()
+                                            callback(cheat.value)
+                                        end)
+        
+                                        if not s then warn("error: ".. e) end
+                                    end
+                                end
+
+                                rs.RenderStepped:wait()
                             end
                         end)
-                    end   
-                end    
+                        cheat.hsvbar.MouseButton2Down:Connect(function()
+                            local rs = finity.gs["RunService"]
+                            local uis = finity.gs["UserInputService"]
+                            local last = cheat.value;
 
-                function Dropdown:Refresh(opts,del)
-                    if del then
-                        for _,v in pairs(DropMain.Holder:GetChildren()) do
-                            if v:IsA"TextButton" then
-								v:Destroy()
-                                DropMain.Holder.Size = Dropdown.Toggled and UDim2.new(1,0,0,6+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,0)
-                                DropMain.Size = Dropdown.Toggled and UDim2.new(1,0,0,38+DropMain.Holder.Layout.AbsoluteContentSize.Y) or UDim2.new(1,0,0,32)
+                            cheat.hsvbar.Image = lumienceimage
+
+                            while uis:IsMouseButtonPressed'MouseButton2' do
+                                local mouseloc = uis:GetMouseLocation()
+                                local sx = cheat.arrowpreview.AbsoluteSize.X / 2
+                                local offset = (mouseloc.x - cheat.hsvbar.AbsolutePosition.X) - sx
+                                local scale = offset / cheat.hsvbar.AbsoluteSize.X
+                                local position = math.clamp(offset, -sx, cheat.hsvbar.AbsoluteSize.X - sx) / cheat.hsvbar.AbsoluteSize.X
+
+                                finity.gs["TweenService"]:Create(cheat.arrowpreview, TweenInfo.new(0.1), {Position = UDim2.new(position, 0, 0.5, -6)}):Play()
+                                
+                                cheat.value = Color3.fromHSV(1, 0, 1 - math.clamp(scale, 0, 1))
+
+                                if cheat.value ~= last then
+                                    last = cheat.value
+
+                                    if callback then
+                                        local s, e = pcall(function()
+                                            callback(cheat.value)
+                                        end)
+        
+                                        if not s then warn("error: ".. e) end
+                                    end
+                                end
+
+                                rs.RenderStepped:wait()
+                            end
+                        end)
+
+						cheat.hsvbar.Parent = cheat.container
+						cheat.arrowpreview.Parent = cheat.hsvbar
+					elseif string.lower(kind) == "dropdown" then
+						if data then
+							if data.default then
+								cheat.value = data.default
+							elseif data.options then
+								cheat.value = data.options[1]
+							else
+								cheat.value = "None"
 							end
-                        end    
-                    end    
-                    AddOptions(opts)
-                end    
-             
+						end
+						
+						local options
+						
+						if data and data.options then
+							options = data.options
+						end
 
-                DropMain.Btn.MouseButton1Click:Connect(function()
-                    ToggleDrop()
-                end)
+						cheat.dropped = false
 
-                function Dropdown:Set(val)
-					Dropdown.Value = val
-                    DropMain.Btn.Title.Text = text .. " - " .. table.concat(Dropdown.Value, ", ")
-					return callback(Dropdown.Value)
+						cheat.dropdown = finity:Create("ImageButton", {
+							Name = "Dropdown",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.dropdown_background,
+							ImageTransparency = 0.5,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.02
+						})
+
+						cheat.selected = finity:Create("TextLabel", {
+							Name = "Selected",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0, 10, 0, 0),
+							Size = UDim2.new(1, -35, 1, 0),
+							ZIndex = 2,
+							Font = Enum.Font.Gotham,
+							Text = tostring(cheat.value),
+							TextColor3 = theme.dropdown_text,
+							TextSize = 13,
+							TextXAlignment = Enum.TextXAlignment.Left
+						})
+
+						cheat.list = finity:Create("ScrollingFrame", {
+							Name = "List",
+							BackgroundColor3 = theme.dropdown_background,
+							BackgroundTransparency = 0.5,
+							BorderSizePixel = 0,
+							Position = UDim2.new(0, 0, 1, 0),
+							Size = UDim2.new(1, 0, 0, 100),
+							ZIndex = 3,
+							BottomImage = "rbxassetid://967852042",
+							MidImage = "rbxassetid://967852042",
+							TopImage = "rbxassetid://967852042",
+							ScrollBarThickness = 4,
+							VerticalScrollBarInset = Enum.ScrollBarInset.None,
+							ScrollBarImageColor3 = theme.dropdown_scrollbar_color
+						})
+
+						local uilistlayout = finity:Create("UIListLayout", {
+							SortOrder = Enum.SortOrder.LayoutOrder,
+							Padding = UDim.new(0, 2)
+						})
+						uilistlayout.Parent = cheat.list
+						uilistlayout = nil
+						local uipadding = finity:Create("UIPadding", {
+							PaddingLeft = UDim.new(0, 2)
+						})
+						uipadding.Parent = cheat.list
+						uipadding = nil
+						
+						local function refreshOptions()
+							if cheat.dropped then
+								cheat.fadelist()
+							end	
+							
+							for _, child in next, cheat.list:GetChildren() do
+								if child:IsA("TextButton") then
+									child:Destroy()
+								end
+							end
+							
+							for _, value in next, options do
+								local button = finity:Create("TextButton", {
+									BackgroundColor3 = Color3.new(1, 1, 1),
+									BackgroundTransparency = 1,
+									Size = UDim2.new(1, 0, 0, 20),
+									ZIndex = 3,
+									Font = Enum.Font.Gotham,
+									Text = value,
+									TextColor3 = theme.dropdown_text,
+									TextSize = 13
+								})
+	
+								button.Parent = cheat.list
+	
+								button.MouseEnter:Connect(function()
+									finity.gs["TweenService"]:Create(button, TweenInfo.new(0.1), {TextColor3 = theme.dropdown_text_hover}):Play()
+								end)
+								button.MouseLeave:Connect(function()
+									finity.gs["TweenService"]:Create(button, TweenInfo.new(0.1), {TextColor3 = theme.dropdown_text}):Play()
+								end)
+								button.MouseButton1Click:Connect(function()
+									if cheat.dropped then
+										cheat.value = value
+										cheat.selected.Text = value
+	
+										cheat.fadelist()
+										
+										if callback then
+											local s, e = pcall(function()
+												callback(cheat.value)
+											end)
+	
+											if not s then warn("error: ".. e) end
+										end
+									end
+								end)
+								
+								
+								finity.gs["TweenService"]:Create(button, TweenInfo.new(0), {TextTransparency = 1}):Play()
+							end
+							
+							finity.gs["TweenService"]:Create(cheat.list, TweenInfo.new(0), {Size = UDim2.new(1, 0, 0, 0), Position = UDim2.new(0, 0, 1, 0), CanvasSize = UDim2.new(0, 0, 0, cheat.list["UIListLayout"].AbsoluteContentSize.Y), ScrollBarImageTransparency = 1, BackgroundTransparency = 1}):Play()
+						end
+						
+						
+						function cheat.fadelist()
+							cheat.dropped = not cheat.dropped
+
+							if cheat.dropped then
+								for _, button in next, cheat.list:GetChildren() do
+									if button:IsA("TextButton") then
+										finity.gs["TweenService"]:Create(button, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
+									end
+								end
+
+								finity.gs["TweenService"]:Create(cheat.list, TweenInfo.new(0.2), {Size = UDim2.new(1, 0, 0, math.clamp(cheat.list["UIListLayout"].AbsoluteContentSize.Y, 0, 150)), Position = UDim2.new(0, 0, 1, 0), ScrollBarImageTransparency = 0, BackgroundTransparency = 0.5}):Play()
+							else
+								for _, button in next, cheat.list:GetChildren() do
+									if button:IsA("TextButton") then
+										finity.gs["TweenService"]:Create(button, TweenInfo.new(0.2), {TextTransparency = 1}):Play()
+									end
+								end
+
+								finity.gs["TweenService"]:Create(cheat.list, TweenInfo.new(0.2), {Size = UDim2.new(1, 0, 0, 0), Position = UDim2.new(0, 0, 1, 0), ScrollBarImageTransparency = 1, BackgroundTransparency = 1}):Play()
+							end
+						end
+
+						cheat.dropdown.MouseEnter:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.selected, TweenInfo.new(0.1), {TextColor3 = theme.dropdown_text_hover}):Play()
+						end)
+						cheat.dropdown.MouseLeave:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.selected, TweenInfo.new(0.1), {TextColor3 = theme.dropdown_text}):Play()
+						end)
+						cheat.dropdown.MouseButton1Click:Connect(function()
+							cheat.fadelist()
+						end)
+
+						refreshOptions()
+						
+						function cheat:RemoveOption(value)
+							local removed = false
+							for index, option in next, options do
+								if option == value then
+									table.remove(options, index)
+									removed = true
+									break
+								end
+							end
+							
+							if removed then
+								refreshOptions()
+							end
+							
+							return removed
+						end
+						
+						function cheat:AddOption(value)
+							table.insert(options, value)
+							
+							refreshOptions()
+						end
+						
+						function cheat:SetValue(value)
+							cheat.selected.Text = value
+							cheat.value = value
+							
+							if cheat.dropped then
+								cheat.fadelist()
+							end
+							
+							if callback then
+								local s, e = pcall(function()
+									callback(cheat.value)
+								end)
+
+								if not s then warn("error: ".. e) end
+							end
+						end
+
+						cheat.selected.Parent = cheat.dropdown
+						cheat.dropdown.Parent = cheat.container
+						cheat.list.Parent = cheat.container
+					elseif string.lower(kind) == "textbox" then
+						local placeholdertext = data and data.placeholder
+
+						cheat.background = finity:Create("ImageLabel", {
+							Name = "Background",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.textbox_background,
+							ImageTransparency = 0.5,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.02
+						})
+
+						cheat.textbox = finity:Create("TextBox", {
+							Name = "Textbox",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0, 0, 0, 0),
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 2,
+							Font = Enum.Font.Gotham,
+							Text = "",
+							TextColor3 = theme.textbox_text,
+							PlaceholderText = placeholdertext or "Value",
+							TextSize = 13,
+                            TextXAlignment = Enum.TextXAlignment.Center,
+                            ClearTextOnFocus = false
+						})
+
+						cheat.background.MouseEnter:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.textbox, TweenInfo.new(0.1), {TextColor3 = theme.textbox_text_hover}):Play()
+						end)
+						cheat.background.MouseLeave:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.textbox, TweenInfo.new(0.1), {TextColor3 = theme.textbox_text}):Play()
+						end)
+						cheat.textbox.Focused:Connect(function()
+							typing = true
+
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.textbox_background_hover}):Play()
+						end)
+						cheat.textbox.FocusLost:Connect(function()
+							typing = false
+
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.textbox_background}):Play()
+							finity.gs["TweenService"]:Create(cheat.textbox, TweenInfo.new(0.1), {TextColor3 = theme.textbox_text}):Play()
+
+							cheat.value = cheat.textbox.Text
+
+							if callback then
+								local s, e = pcall(function()
+									callback(cheat.value)
+								end)
+
+								if not s then warn("error: "..e) end
+							end
+						end)
+
+						cheat.background.Parent = cheat.container
+						cheat.textbox.Parent = cheat.container
+					elseif string.lower(kind) == "slider" then
+						cheat.value = 0
+
+						local suffix = data.suffix or ""
+						local minimum = data.min or 0
+						local maximum = data.max or 1
+						
+						local moveconnection
+						local releaseconnection
+
+						cheat.sliderbar = finity:Create("ImageButton", {
+							Name = "Sliderbar",
+							AnchorPoint = Vector2.new(1, 0.5),
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(1, 0, 0.5, 0),
+							Size = UDim2.new(1, 0, 0, 6),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.slider_background,
+							ImageTransparency = 0.5,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.02,
+						})
+
+						cheat.numbervalue = finity:Create("TextLabel", {
+							Name = "Value",
+							AnchorPoint = Vector2.new(0, 0.5),
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0.5, 5, 0.5, 0),
+							Size = UDim2.new(1, 0, 0, 13),
+							ZIndex = 2,
+							Font = Enum.Font.Gotham,
+							TextXAlignment = Enum.TextXAlignment.Left,
+							Text = "",
+							TextTransparency = 1,
+							TextColor3 = theme.slider_text,
+							TextSize = 13,
+						})
+
+						cheat.visiframe = finity:Create("ImageLabel", {
+							Name = "Frame",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Size = UDim2.new(0.5, 0, 1, 0),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.slider_color,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.02
+						})
+
+						cheat.sliderbar.MouseButton1Down:Connect(function()
+							local size = math.clamp(mouse.X - cheat.sliderbar.AbsolutePosition.X, 0, 150)
+							local percent = size / 150
+
+							cheat.value = math.floor((minimum + (maximum - minimum) * percent) * 100) / 100
+							cheat.numbervalue.Text = tostring(cheat.value) .. suffix
+
+							if callback then
+								local s, e = pcall(function()
+									callback(cheat.value)
+								end)
+
+								if not s then warn("error: ".. e) end
+							end
+
+							finity.gs["TweenService"]:Create(cheat.visiframe, TweenInfo.new(0.1), {
+								Size = UDim2.new(size / 150, 0, 1, 0),
+								ImageColor3 = theme.slider_color_sliding
+							}):Play()
+
+							finity.gs["TweenService"]:Create(cheat.numbervalue, TweenInfo.new(0.1), {
+								Position = UDim2.new(size / 150, 5, 0.5, 0),
+								TextTransparency = 0
+							}):Play()
+
+							moveconnection = mouse.Move:Connect(function()
+								local size = math.clamp(mouse.X - cheat.sliderbar.AbsolutePosition.X, 0, 150)
+								local percent = size / 150
+
+								cheat.value = math.floor((minimum + (maximum - minimum) * percent) * 100) / 100
+								cheat.numbervalue.Text = tostring(cheat.value) .. suffix
+
+								if callback then
+									local s, e = pcall(function()
+										callback(cheat.value)
+									end)
+
+									if not s then warn("error: ".. e) end
+								end
+
+								finity.gs["TweenService"]:Create(cheat.visiframe, TweenInfo.new(0.1), {
+									Size = UDim2.new(size / 150, 0, 1, 0),
+								ImageColor3 = theme.slider_color_sliding
+                                }):Play()
+                                
+                                local Position = UDim2.new(size / 150, 5, 0.5, 0);
+
+                                if Position.Width.Scale >= 0.6 then
+                                    Position = UDim2.new(1, -cheat.numbervalue.TextBounds.X, 0.5, 10);
+                                end
+
+								finity.gs["TweenService"]:Create(cheat.numbervalue, TweenInfo.new(0.1), {
+									Position = Position,
+									TextTransparency = 0
+								}):Play()
+							end)
+
+							releaseconnection = finity.gs["UserInputService"].InputEnded:Connect(function(Mouse)
+								if Mouse.UserInputType == Enum.UserInputType.MouseButton1 then
+
+									finity.gs["TweenService"]:Create(cheat.visiframe, TweenInfo.new(0.1), {
+										ImageColor3 = theme.slider_color
+									}):Play()
+
+									finity.gs["TweenService"]:Create(cheat.numbervalue, TweenInfo.new(0.1), {
+										TextTransparency = 1
+									}):Play()
+
+									moveconnection:Disconnect()
+									moveconnection = nil
+									releaseconnection:Disconnect()
+									releaseconnection = nil
+								end
+							end)
+						end)
+
+						cheat.visiframe.Parent = cheat.sliderbar
+						cheat.numbervalue.Parent = cheat.sliderbar
+						cheat.sliderbar.Parent = cheat.container
+					elseif string.lower(kind) == "button" then
+						local button_text = data and data.text
+
+						cheat.background = finity:Create("ImageLabel", {
+							Name = "Background",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.button_background,
+							ImageTransparency = 0.5,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.02
+						})
+
+						cheat.button = finity:Create("TextButton", {
+							Name = "Button",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0, 0, 0, 0),
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 2,
+							Font = Enum.Font.Gotham,
+							Text = button_text or "Button",
+							TextColor3 = theme.textbox_text,
+							TextSize = 13,
+							TextXAlignment = Enum.TextXAlignment.Center
+						})
+
+						cheat.button.MouseEnter:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background_hover}):Play()
+						end)
+						cheat.button.MouseLeave:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background}):Play()
+						end)
+						cheat.button.MouseButton1Down:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background_down}):Play()
+						end)
+						cheat.button.MouseButton1Up:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background}):Play()
+							
+							if callback then
+								local s, e = pcall(function()
+									callback()
+								end)
+
+								if not s then warn("error: ".. e) end
+							end
+						end)
+
+						cheat.background.Parent = cheat.container
+						cheat.button.Parent = cheat.container
+					
+					elseif string.lower(kind) == "keybind" or string.lower(kind) == "bind" then
+                        local callback_bind = data and data.bind
+                        local connection
+						
+						cheat.background = finity:Create("ImageLabel", {
+							Name = "Background",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 2,
+							Image = "rbxassetid://3570695787",
+							ImageColor3 = theme.button_background,
+							ImageTransparency = 0.5,
+							ScaleType = Enum.ScaleType.Slice,
+							SliceCenter = Rect.new(100, 100, 100, 100),
+							SliceScale = 0.02
+						})
+
+						cheat.button = finity:Create("TextButton", {
+							Name = "Button",
+							BackgroundColor3 = Color3.new(1, 1, 1),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(0, 0, 0, 0),
+							Size = UDim2.new(1, 0, 1, 0),
+							ZIndex = 2,
+							Font = Enum.Font.Gotham,
+							Text = "Click to Bind",
+							TextColor3 = theme.textbox_text,
+							TextSize = 13,
+							TextXAlignment = Enum.TextXAlignment.Center
+						})
+
+						cheat.button.MouseEnter:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background_hover}):Play()
+						end)
+						cheat.button.MouseLeave:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background}):Play()
+						end)
+						cheat.button.MouseButton1Down:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background_down}):Play()
+                        end)
+                        cheat.button.MouseButton2Down:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background_down}):Play()
+						end)
+						cheat.button.MouseButton1Up:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background}):Play()
+							cheat.button.Text = "Press key..."
+							
+							connection = finity.gs["UserInputService"].InputBegan:Connect(function(Input)
+								if Input.UserInputType.Name == "Keyboard" and Input.KeyCode ~= finityData.ToggleKey and Input.KeyCode ~= Enum.KeyCode.Backspace then
+                                    cheat.button.Text = "Bound to " .. tostring(Input.KeyCode.Name)
+                                    if connection then
+                                        connection:Disconnect()
+                                        connection = nil
+                                    end
+									
+									delay(0, function()
+										callback_bind = Input.KeyCode
+									end)
+								elseif Input.KeyCode == Enum.KeyCode.Backspace then
+									callback_bind = nil
+									cheat.button.Text = "Click to Bind"
+									connection:Disconnect()
+									connection = nil
+								elseif Input.KeyCode == finityData.ToggleKey then
+									cheat.button.Text = "Invalid Key";
+								end
+							end)
+                        end)
+                        cheat.button.MouseButton2Up:Connect(function()
+							finity.gs["TweenService"]:Create(cheat.background, TweenInfo.new(0.2), {ImageColor3 = theme.button_background}):Play()
+						
+							callback_bind = nil
+                            cheat.button.Text = "Click to Bind"
+                            if connection then
+                                connection:Disconnect()
+                                connection = nil
+                            end
+						end)
+						
+						
+						finity.gs["UserInputService"].InputBegan:Connect(function(Input, Process)
+							if callback_bind and Input.KeyCode == callback_bind and not Process then
+								if callback then
+									local s, e = pcall(function()
+										callback(Input.KeyCode)
+									end)
+	
+									if not s then warn("error: ".. e) end
+								end
+							end
+						end)
+						
+						if callback_bind then
+							cheat.button.Text = "Bound to " .. tostring(callback_bind.Name)
+						end
+
+						cheat.background.Parent = cheat.container
+						cheat.button.Parent = cheat.container
+					end
 				end
 
-                spawn(function()
-                    while wait() do
-                       DropMain.Btn.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Dropdown
-                       DropMain.Btn.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                       DropMain.Btn.Ico.ImageColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
+				cheat.frame.Parent = sector.container
+				cheat.label.Parent = cheat.frame
+				cheat.container.Parent = cheat.frame
 
-                Dropdown:Refresh(list,false)
-                Dropdown:Set(def)
-                SolarisLib.Flags[flag] = Dropdown
-                return Dropdown
-            end    
-            function ItemHold:Colorpicker(text,preset,flag,callback)
-                local ColorH, ColorS, ColorV = 1, 1, 1
-                local ColorPicker, ColorPreset, DragPreset = {Value = preset, Toggled = false}, game:GetObjects("rbxassetid://7329998014")[1]
-                ColorPreset.Hue.Visible, ColorPreset.Color.Visible = ColorPicker.Toggled, ColorPicker.Toggled
-                ColorPreset.Parent = Section
-                ColorPreset.Btn.Colorpicker.Text = text
-                ColorPreset.Name = text .. "element"
-                ColorPreset.Btn.Box.BackgroundColor3 = preset
-                ColorPreset.Hue.HueGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 4)), ColorSequenceKeypoint.new(0.20, Color3.fromRGB(234, 255, 0)), ColorSequenceKeypoint.new(0.40, Color3.fromRGB(21, 255, 0)), ColorSequenceKeypoint.new(0.60, Color3.fromRGB(0, 255, 255)), ColorSequenceKeypoint.new(0.80, Color3.fromRGB(0, 17, 255)), ColorSequenceKeypoint.new(0.90, Color3.fromRGB(255, 0, 251)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 4))}
-                local Color = ColorPreset.Color
-                local Hue = ColorPreset.Hue
-                local HueSelection = ColorPreset.Hue.HueSelection
-                local ColorSelection = ColorPreset.Color.ColorSelection
-                
-                function UpdateColorPicker()
-                    ColorPreset.Btn.Box.BackgroundColor3 = Color3.fromHSV(ColorH, ColorS, ColorV)
-                    Color.BackgroundColor3 = Color3.fromHSV(ColorH, 1, 1)
-                    pcall(callback, ColorPreset.Btn.Box.BackgroundColor3)
-                end
-    
-                ColorPreset.Btn.MouseButton1Click:Connect(function()
-                    ColorPicker.Toggled = not ColorPicker.Toggled
-                    TweenService:Create(ColorPreset,TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = ColorPicker.Toggled and UDim2.new(1,0,0,120) or UDim2.new(1,0,0,32)}):Play() 
-                    ColorPreset.Hue.Visible, ColorPreset.Color.Visible = ColorPicker.Toggled, ColorPicker.Toggled
-                end)
+				return cheat
+			end
 
-                ColorH = 1 - (math.clamp(HueSelection.AbsolutePosition.Y - Hue.AbsolutePosition.Y, 0, Hue.AbsoluteSize.Y) / Hue.AbsoluteSize.Y)
-			    ColorS = (math.clamp(ColorSelection.AbsolutePosition.X - Color.AbsolutePosition.X, 0, Color.AbsoluteSize.X) / Color.AbsoluteSize.X)
-                ColorV = 1 - (math.clamp(ColorSelection.AbsolutePosition.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) / Color.AbsoluteSize.Y)
+			sector.frame.Parent = category[calculateSector()]
+			sector.container.Parent = sector.frame
+			sector.title.Parent = sector.frame
 
-                ColorPreset.Btn.Box.BackgroundColor3 = preset
-                Color.BackgroundColor3 = preset
-                pcall(callback, ColorPreset.Btn.Box.BackgroundColor3)
+			return sector
+		end
+		
+		firstCategory = false
+		
+		return category
+	end
 
-                Color.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        if ColorInput then
-                            ColorInput:Disconnect()
-                        end
-                        ColorInput = RunService.RenderStepped:Connect(function()
-                            local ColorX = (math.clamp(Mouse.X - Color.AbsolutePosition.X, 0, Color.AbsoluteSize.X) / Color.AbsoluteSize.X)
-                            local ColorY = (math.clamp(Mouse.Y - Color.AbsolutePosition.Y, 0, Color.AbsoluteSize.Y) / Color.AbsoluteSize.Y)
-                            ColorSelection.Position = UDim2.new(ColorX, 0, ColorY, 0)
-                            ColorS = ColorX
-                            ColorV = 1 - ColorY
-                            UpdateColorPicker()
-                        end)
-                    end
-                end)
+	self:addShadow(self2.container, 0)
 
-                Color.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        if ColorInput then
-                            ColorInput:Disconnect()
-                        end
-                    end
-                end)
+	self2.categories.ClipsDescendants = true
+	
+	if not finity.gs["RunService"]:IsStudio() then
+		self2.userinterface.Parent = self.gs["CoreGui"]
+	else
+		self2.userinterface.Parent = self.gs["Players"].LocalPlayer:WaitForChild("PlayerGui")
+	end
+	
+	self2.container.Parent = self2.userinterface
+	self2.categories.Parent = self2.container
+	self2.sidebar.Parent = self2.container
+	self2.topbar.Parent = self2.container
+	self2.tip.Parent = self2.topbar
 
-                Hue.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        if HueInput then
-                            HueInput:Disconnect()
-                        end
-    
-                        HueInput = RunService.RenderStepped:Connect(function()
-                            local HueY = (math.clamp(Mouse.Y - Hue.AbsolutePosition.Y, 0, Hue.AbsoluteSize.Y) / Hue.AbsoluteSize.Y)
-    
-                            HueSelection.Position = UDim2.new(0.48, 0, HueY, 0)
-                            ColorH = 1 - HueY
-    
-                            UpdateColorPicker(true)
-                        end)
-                    end
-                end)
-    
-                Hue.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        if HueInput then
-                            HueInput:Disconnect()
-                        end
-                    end
-                end)
+	return self2, finityData
+end
 
-                spawn(function()
-                    while wait() do
-                       ColorPreset.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Colorpicker
-                       ColorPreset.Btn.Colorpicker.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
-
-                return ColorPicker
-            end
-            function ItemHold:Label(text)
-                local Label, LabelFrame = {}, game:GetObjects("rbxassetid://7032552322")[1]
-                LabelFrame.Parent = Section
-                LabelFrame.Title.Text = text
-                LabelFrame.Name = text .. "element"
-
-                function Label:Set(tochange)
-                    LabelFrame.Title.Text = tochange
-                    LabelFrame.Name = text .. "element"
-                end    
-
-                
-                spawn(function()
-                    while wait() do
-                       LabelFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Label
-                       LabelFrame.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
-
-                return Label
-            end
-            function ItemHold:Textbox(text,disappear,callback)
-                local Textbox, TextboxFrame = {}, game:GetObjects("rbxassetid://7147292392")[1]
-                TextboxFrame.Parent = Section
-                TextboxFrame.Title.Text = text
-                TextboxFrame.Name = text .. "element"
-
-                TextboxFrame.Box.Changed:Connect(function()
-                    TextboxFrame.Box.Size = UDim2.new(0,TextboxFrame.Box.TextBounds.X + 16,0,22)
-                end)
-                TextboxFrame.Box.PlaceholderText = "                  "
-
-                TextboxFrame.InputBegan:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        TextboxFrame.Box:CaptureFocus()
-					end
-				end)
-				
-
-                TextboxFrame.Box.FocusLost:Connect(function()
-                    local txt = TextboxFrame.Box.Text
-                    if disappear then
-                        TextboxFrame.Box.Text = ""
-                    end  
-                    return callback(txt)
-				end)
-
-                UserInputService.InputBegan:Connect(function(input)
-					if input.KeyCode == Enum.KeyCode.Escape and TextboxFrame.Box:IsFocused() then
-						TextboxFrame.Box:ReleaseFocus()
-					end
-				end)
-                
-                spawn(function()
-                    while wait() do
-                       TextboxFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Textbox
-                       TextboxFrame.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                       TextboxFrame.Box.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextboxFrame
-                       TextboxFrame.Box.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
-                return Textbox
-            end    
-            function ItemHold:Bind(text,preset,holdmode,flag,callback)
-                local Bind, BindFrame = {Value, Binding = false, Holding = false}, game:GetObjects("rbxassetid://7126874744")[1]
-                BindFrame.Parent = Section
-                BindFrame.Title.Text = text
-                BindFrame.Name = text .. "element"
-
-                
-
-                BindFrame.InputEnded:Connect(function(Input)
-                    if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        if Bind.Binding then return end
-                        Bind.Binding = true
-                        BindFrame.BText.Text = "..."
-                    end
-                end)
-
-                UserInputService.InputBegan:Connect(function(Input)
-                    if UserInputService:GetFocusedTextBox() then return end
-                    if (Input.KeyCode.Name == Bind.Value or Input.UserInputType.Name == Bind.Value) and not Bind.Binding then
-                        if holdmode then
-                            Holding = true
-                            callback(Holding)
-                        else
-                            callback()
-                        end
-                    elseif Bind.Binding then
-                        local Key
-                        pcall(function()
-                            if not CheckKey(BlacklistedKeys, Input.KeyCode) then
-                                Key = Input.KeyCode
-                            end
-                        end)
-                        pcall(function()
-                            if CheckKey(WhitelistedMouse, Input.UserInputType) and not Key then
-                                Key = Input.UserInputType
-                            end
-                        end)
-                        Key = Key or Bind.Value
-                        Bind:Set(Key)
-                    end
-                end)
-
-                UserInputService.InputEnded:Connect(function(Input)
-                    if Input.KeyCode.Name == Bind.Value or Input.UserInputType.Name == Bind.Value then
-                        if holdmode and Holding then
-                            Holding = false
-                            callback(Holding)
-                        end
-                    end
-                end)
-
-                function Bind:Set(key)
-                    self.Binding = false
-                    self.Value = key or self.Value
-                    self.Value = self.Value.Name or self.Value
-                    BindFrame.BText.Text = self.Value
-				end
-
-                spawn(function()
-                    while wait() do
-                       BindFrame.BackgroundColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].Bind
-                       BindFrame.Title.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                       BindFrame.BText.TextColor3 = SolarisLib.Themes[SolarisLib.Settings.Theme].TextColor
-                    end
-                end)
-
-				Bind:Set(preset)
-                SolarisLib.Flags[flag] = Bind
-                return Bind
-            end    
-            return ItemHold
-        end    
-        return SectionHold
-    end 
-    return TabHolder
-end    
-return SolarisLib
+return finity
