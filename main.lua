@@ -9,4 +9,4 @@
 local gameId = game.GameId
 local placeId = game.PlaceId
 
-loadstring(game.HttpGet("https://raw.githubusercontent.com/UnknownGamer696/Space-Hub/main/games/" .. gameId or placeId or "Universal"))()
+loadstring(game.HttpGet("https://raw.githubusercontent.com/UnknownGamer696/Space-Hub/main/games/" .. gameId or placeId or "Universal" .. ".lua"))()
